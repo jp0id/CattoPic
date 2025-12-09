@@ -7,7 +7,6 @@ import ApiKeyModal from './components/ApiKeyModal'
 import { UploadResponse, StatusMessage as StatusMessageType, ConfigSettings } from './types'
 import Header from './components/Header'
 import UploadSection from './components/UploadSection'
-import StatusMessage from './components/StatusMessage'
 import UploadProgress from './components/UploadProgress'
 import ImageSidebar from './components/ImageSidebar'
 import PreviewSidebar from './components/upload/PreviewSidebar'
@@ -36,7 +35,8 @@ export default function Home() {
       // 上传完成后关闭预览侧边栏
       setShowPreviewSidebar(false)
     }
-  }, [uploadResults])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadResults.length])
 
   // 监听文件选择，当有文件选择时，打开预览侧边栏
   useEffect(() => {
@@ -45,7 +45,8 @@ export default function Home() {
     } else if (fileDetails.length === 0) {
       setShowPreviewSidebar(false)
     }
-  }, [fileDetails])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fileDetails.length])
 
   useEffect(() => {
     const checkApiKey = async () => {
@@ -70,6 +71,7 @@ export default function Home() {
     }
 
     checkApiKey()
+     
   }, [])
 
   useEffect(() => {
@@ -88,6 +90,7 @@ export default function Home() {
     }
 
     fetchConfig()
+     
   }, [])
 
   const handleUpload = async () => {
@@ -142,7 +145,7 @@ export default function Home() {
       const resultsWithIds = result.results.map(item => {
         // Extract the real image ID from the original URL if available
         let imageId = Math.random().toString(36).substring(2) // Default to random ID
-        let path = item.urls?.original || ''
+        const path = item.urls?.original || ''
 
         if (item.urls?.original) {
           // Extract file ID from the original URL
@@ -269,6 +272,23 @@ export default function Home() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-8" style={mainContentStyle}>
       <Header onApiKeyClick={() => setShowApiKeyModal(true)} isKeyVerified={isKeyVerified} />
+
+      {status && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className={`mb-6 p-4 rounded-xl ${
+            status.type === "success"
+              ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800"
+              : status.type === "warning"
+              ? "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800"
+              : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800"
+          }`}
+        >
+          {status.message}
+        </motion.div>
+      )}
 
       <UploadSection
         onUpload={handleUpload}

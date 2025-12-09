@@ -67,6 +67,7 @@ export default function ImageFilters({ onFilterChange }: ImageFiltersProps) {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFilterChange = useCallback((type: string, value: string) => {
@@ -203,6 +204,7 @@ export default function ImageFilters({ onFilterChange }: ImageFiltersProps) {
         </AnimatePresence>
       </div>
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDropdown, format, orientation, tag, formatOptions, orientationOptions, filteredTags, searchQuery, handleFilterChange]);
 
   return (

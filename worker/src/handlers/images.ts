@@ -93,7 +93,7 @@ export async function updateImageHandler(c: Context<{ Bindings: Env }>): Promise
     const metadata = new MetadataService(c.env.DB);
 
     // Build updates object
-    const updates: Record<string, any> = {};
+    const updates: Record<string, string[] | string | undefined> = {};
 
     if (body.tags !== undefined) {
       updates.tags = Array.isArray(body.tags) ? body.tags : parseTags(body.tags);

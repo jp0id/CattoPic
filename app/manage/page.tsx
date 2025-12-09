@@ -40,6 +40,36 @@ export default function Manage() {
   const [isKeyVerified, setIsKeyVerified] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
+  const loadMoreImages = useCallback(async () => {
+    if (!hasMore || isFetchingMore) return;
+
+    try {
+      setIsFetchingMore(true);
+      const nextPage = page + 1;
+
+      const data = await api.get<ImageListResponse>("/api/images", {
+        page: nextPage.toString(),
+        limit: "24",
+        format: filters.format,
+        orientation: filters.orientation,
+        tag: filters.tag,
+      });
+
+      setImages(prevImages => [...prevImages, ...data.images]);
+      setPage(nextPage);
+      setHasMore(data.page < data.totalPages);
+
+    } catch (error) {
+      console.error("加载更多图片失败:", error);
+      setStatus({
+        type: "error",
+        message: "加载更多图片失败",
+      });
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [hasMore, isFetchingMore, page, filters]);
+
   const lastImageElementRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (isLoading || isFetchingMore) return;
@@ -51,11 +81,12 @@ export default function Manage() {
       });
       if (node) observer.current.observe(node);
     },
-    [isLoading, isFetchingMore, hasMore]
+    [isLoading, isFetchingMore, hasMore, loadMoreImages]
   );
 
   useEffect(() => {
     checkApiKey();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkApiKey = async () => {
@@ -122,36 +153,6 @@ export default function Manage() {
     }
   };
 
-  const loadMoreImages = async () => {
-    if (!hasMore || isFetchingMore) return;
-    
-    try {
-      setIsFetchingMore(true);
-      const nextPage = page + 1;
-      
-      const data = await api.get<ImageListResponse>("/api/images", {
-        page: nextPage.toString(),
-        limit: "24", 
-        format: filters.format,
-        orientation: filters.orientation,
-        tag: filters.tag,
-      });
-
-      setImages(prevImages => [...prevImages, ...data.images]);
-      setPage(nextPage);
-      setHasMore(data.page < data.totalPages);
-      
-    } catch (error) {
-      console.error("加载更多图片失败:", error);
-      setStatus({
-        type: "error",
-        message: "加载更多图片失败",
-      });
-    } finally {
-      setIsFetchingMore(false);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     try {
       const image = images.find((img) => img.id === id);
@@ -184,6 +185,7 @@ export default function Manage() {
 
   useEffect(() => {
     fetchImages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const handleFilterChange = (

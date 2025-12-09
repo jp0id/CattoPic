@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect } from 'react'
 import UploadDropzone from './upload/UploadDropzone'
 import ExpirySelector from './ExpirySelector'
 import TagSelector from './upload/TagSelector'
@@ -75,10 +75,11 @@ export default function UploadSection({
       setFileDetails([])
       setExceedsLimit(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileCount])
 
-  // 同步现有文件列表
-  useEffect(() => {
+  // 同步现有文件列表 (useLayoutEffect 用于同步 props 到 state)
+  useLayoutEffect(() => {
     if (existingFiles.length > 0) {
       // 更新本地状态以反映外部文件列表
       const filesArray = existingFiles.map(item => item.file);

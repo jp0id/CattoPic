@@ -16,7 +16,8 @@ export const ImageInfo = ({ image }: ImageInfoProps) => {
   const format = (image.format || '').toLowerCase();
   const orientation = image.orientation || '';
   const size = isImageFile ? (image as ImageFile).sizes?.original || 0 : 0;
-  const path = isImageFile ? (image as ImageFile).paths?.original || '' : '';
+  const _path = isImageFile ? (image as ImageFile).paths?.original || '' : '';
+  void _path;
   const width = 'width' in image ? image.width : undefined;
   const height = 'height' in image ? image.height : undefined;
   const expiryTime = 'expiryTime' in image ? image.expiryTime : undefined;

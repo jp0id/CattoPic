@@ -71,7 +71,7 @@ export const api = {
   get: <T>(endpoint: string, params?: Record<string, string>) =>
     request<T>(endpoint, { method: "GET", params }),
 
-  post: <T>(endpoint: string, data?: any) =>
+  post: <T>(endpoint: string, data?: Record<string, unknown>) =>
     request<T>(endpoint, {
       method: "POST",
       headers: {
@@ -80,7 +80,7 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
-  put: <T>(endpoint: string, data?: any) =>
+  put: <T>(endpoint: string, data?: Record<string, unknown>) =>
     request<T>(endpoint, {
       method: "PUT",
       headers: {

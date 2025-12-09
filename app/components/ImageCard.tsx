@@ -27,14 +27,15 @@ import {
   CopyIcon
 } from './ui/icons';
 
-// 格式化文件大小
-const formatFileSize = (bytes: number): string => {
+// 格式化文件大小 (保留以备将来使用)
+const _formatFileSize = (bytes: number): string => {
   if (bytes < 1024) return bytes + " B";
   else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
   else if (bytes < 1024 * 1024 * 1024)
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   else return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
 };
+void _formatFileSize;
 
 export default function ImageCard({
   image,
@@ -45,9 +46,10 @@ export default function ImageCard({
   onClick: () => void;
   onDelete: (id: string) => Promise<void>;
 }) {
-  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">(
+  const [copyStatus, _setCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle"
   );
+  void _setCopyStatus;
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const isGif = image.format.toLowerCase() === "gif";
@@ -241,6 +243,7 @@ export default function ImageCard({
         >
           {isGif ? (
             // Use img tag for GIFs to ensure animation plays
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={getFullUrl(image.urls?.original || '')}
               alt={image.originalName}

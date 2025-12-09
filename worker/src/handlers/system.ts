@@ -13,7 +13,8 @@ const DEFAULT_CONFIG: Config = {
 };
 
 // POST /api/validate-api-key - Validate API key
-export async function validateApiKeyHandler(c: Context<{ Bindings: Env }>): Promise<Response> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function validateApiKeyHandler(_c: Context<{ Bindings: Env }>): Promise<Response> {
   // If we reach here, the API key is already validated by middleware
   return successResponse({ valid: true });
 }
@@ -27,7 +28,7 @@ export async function configHandler(c: Context<{ Bindings: Env }>): Promise<Resp
     `).all<{ key: string; value: string }>();
 
     if (configResult.results && configResult.results.length > 0) {
-      const config: Record<string, any> = { ...DEFAULT_CONFIG };
+      const config: Record<string, number | string | string[]> = { ...DEFAULT_CONFIG };
       for (const row of configResult.results) {
         try {
           config[row.key] = JSON.parse(row.value);

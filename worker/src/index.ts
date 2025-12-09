@@ -1,4 +1,4 @@
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import type { Env } from './types';
 import { AuthService } from './services/auth';
@@ -24,10 +24,10 @@ app.use('*', cors({
 }));
 
 // Handle preflight requests
-app.options('*', (c) => corsResponse());
+app.options('*', () => corsResponse());
 
 // Auth middleware for protected routes
-const authMiddleware = async (c: any, next: () => Promise<void>) => {
+const authMiddleware = async (c: Context<{ Bindings: Env }>, next: () => Promise<void>) => {
   const authHeader = c.req.header('Authorization');
   const apiKey = AuthService.extractApiKey(authHeader);
 
@@ -110,9 +110,10 @@ app.onError((err, c) => {
 
 // Scheduled handler for cron jobs - cleanup expired images
 async function scheduledHandler(
-  event: ScheduledEvent,
+  _event: ScheduledEvent,
   env: Env,
-  ctx: ExecutionContext
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _ctx: ExecutionContext
 ): Promise<void> {
   console.log('Cron job started: cleaning up expired images');
 
@@ -149,7 +150,9 @@ async function scheduledHandler(
   }
 }
 
-export default {
+const handlers = {
   fetch: app.fetch,
   scheduled: scheduledHandler,
 };
+
+export default handlers;

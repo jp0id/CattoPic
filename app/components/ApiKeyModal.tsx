@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { validateApiKey, getApiKey, removeApiKey, setApiKey } from '../utils/auth';
+import { validateApiKey, getApiKey, removeApiKey, setApiKey as saveApiKey } from '../utils/auth';
 import { ApiKeyModalProps } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckIcon, LockClosedIcon, InfoCircledIcon, Spinner } from '../components/ui/icons';
@@ -11,7 +11,7 @@ export default function ApiKeyModal({ isOpen, onClose, onSuccess }: ApiKeyModalP
     const [isValidating, setIsValidating] = useState(false);
     const [error, setError] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
-    const [currentKeyDomain, setCurrentKeyDomain] = useState<string | null>(null);
+    const [, setCurrentKeyDomain] = useState<string | null>(null);
     const [mode, setMode] = useState<'new' | 'manage'>('new');
 
     // 检查是否已经有API Key
@@ -49,7 +49,7 @@ export default function ApiKeyModal({ isOpen, onClose, onSuccess }: ApiKeyModalP
                 setShowSuccess(true);
 
                 // 保存API Key到本地存储
-                setApiKey(apiKey);
+                saveApiKey(apiKey);
 
                 // 等待动画完成后关闭弹窗
                 setTimeout(() => {
@@ -60,7 +60,7 @@ export default function ApiKeyModal({ isOpen, onClose, onSuccess }: ApiKeyModalP
             } else {
                 setError('API Key无效，请重试');
             }
-        } catch (err) {
+        } catch {
             setError('验证失败，请重试');
         } finally {
             setIsValidating(false);

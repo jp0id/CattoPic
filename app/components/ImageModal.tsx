@@ -86,7 +86,7 @@ export default function ImageModal({ image, isOpen, onClose, onDelete }: ImageMo
                   <InfoCircledIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white">图片信息</h4>
                 </div>
-                <ImageInfo image={image as any} />
+                <ImageInfo image={image} />
               </div>
 
               {/* 可用链接 */}
@@ -95,7 +95,7 @@ export default function ImageModal({ image, isOpen, onClose, onDelete }: ImageMo
                   <Link1Icon className="h-5 w-5 text-green-600 dark:text-green-400" />
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white">可用链接</h4>
                 </div>
-                <ImageUrls image={image as any} />
+                <ImageUrls image={image} />
               </div>
             </div>
 

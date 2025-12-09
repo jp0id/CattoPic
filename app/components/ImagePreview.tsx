@@ -42,15 +42,30 @@ export const ImagePreview = ({
     onLoad?.();
   }, [onLoad]);
 
+  // 生成模糊占位图
+  const generateBlurPlaceholder = useCallback(() => {
+    return `data:image/svg+xml;base64,${Buffer.from(
+      `<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+        <filter id="b" color-interpolation-filters="sRGB">
+          <feGaussianBlur stdDeviation="12" />
+        </filter>
+        <rect width="100%" height="100%" fill="#f3f4f6"/>
+        <rect width="100%" height="100%" filter="url(#b)" opacity="0.5"/>
+      </svg>`
+    ).toString('base64')}`;
+  }, []);
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
+     
     setError(null);
 
     const loadImage = async () => {
       try {
         // Generate placeholder for non-GIF images
         if (format !== "gif") {
-          const placeholder = await generateBlurPlaceholder(imageUrl);
+          const placeholder = generateBlurPlaceholder();
           setBlurDataUrl(placeholder);
         }
 
@@ -68,20 +83,7 @@ export const ImagePreview = ({
     return () => {
       setBlurDataUrl(null);
     };
-  }, [imageUrl, priority, format]);
-
-  const generateBlurPlaceholder = async (imageUrl: string) => {
-    // Generate a more detailed placeholder
-    return `data:image/svg+xml;base64,${Buffer.from(
-      `<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-        <filter id="b" color-interpolation-filters="sRGB">
-          <feGaussianBlur stdDeviation="12" />
-        </filter>
-        <rect width="100%" height="100%" fill="#f3f4f6"/>
-        <rect width="100%" height="100%" filter="url(#b)" opacity="0.5"/>
-      </svg>`
-    ).toString('base64')}`;
-  };
+  }, [imageUrl, priority, format, generateBlurPlaceholder]);
 
   if (error) {
     return (
@@ -94,6 +96,7 @@ export const ImagePreview = ({
   if (format === "gif") {
     return (
       <div className="h-full w-full flex items-center justify-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageUrl}
           alt={image.originalName}

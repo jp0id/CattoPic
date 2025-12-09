@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, ReactNode } from "react";
 import { motion, AnimatePresence } from 'motion/react';
 
 export interface ContextMenuItem {
@@ -29,26 +29,27 @@ export default function ContextMenu({ items, isOpen, x, y, onClose }: ContextMen
   const menuRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x, y });
 
-  // 调整菜单位置以避免超出视窗
-  useEffect(() => {
+  // 调整菜单位置以避免超出视窗 (useLayoutEffect 用于 DOM 测量)
+  useLayoutEffect(() => {
     if (isOpen && menuRef.current) {
       const menuRect = menuRef.current.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      
+
       let adjustedX = x;
       let adjustedY = y;
-      
+
       // 水平方向调整
       if (x + menuRect.width > viewportWidth) {
         adjustedX = viewportWidth - menuRect.width - 10;
       }
-      
+
       // 垂直方向调整
       if (y + menuRect.height > viewportHeight) {
         adjustedY = viewportHeight - menuRect.height - 10;
       }
-      
+
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPosition({ x: adjustedX, y: adjustedY });
     }
   }, [isOpen, x, y]);

@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react'
 
-export function useTheme() {
-  const [isDarkMode, setIsDarkMode] = useState(true)
-
-  useEffect(() => {
-    let initialIsDark;
-    try {
-      const savedTheme = localStorage.getItem('theme')
-      if (savedTheme) {
-        initialIsDark = savedTheme === 'dark'
-      } else {
-        initialIsDark = document.documentElement.classList.contains('dark')
-
-      }
-    } catch (e) {
-      console.warn("无法访问 localStorage 获取主题设置:", e);
-      initialIsDark = document.documentElement.classList.contains('dark');
+// 获取初始主题状态
+function getInitialTheme(): boolean {
+  if (typeof window === 'undefined') return true
+  try {
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme) {
+      return savedTheme === 'dark'
     }
+    return document.documentElement.classList.contains('dark')
+  } catch {
+    return document.documentElement.classList.contains('dark')
+  }
+}
 
-    setIsDarkMode(initialIsDark);
-    document.documentElement.classList.toggle('dark', initialIsDark);
-  }, [])
+export function useTheme() {
+  const [isDarkMode, setIsDarkMode] = useState(getInitialTheme)
+
+  // 同步 DOM 状态
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode)
+  }, [isDarkMode])
 
   const toggleTheme = () => {
     const newTheme = !isDarkMode

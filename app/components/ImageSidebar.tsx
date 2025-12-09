@@ -6,29 +6,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import ImageModal from "../components/ImageModal";
 import { getFullUrl } from "../utils/baseUrl";
 import { ImageIcon, Cross1Icon, ExclamationTriangleIcon } from "./ui/icons";
+import { ImageData } from "../types/image";
 
 interface ImageSidebarProps {
   isOpen: boolean;
-  results: Array<{
-    id: string;
-    status: "success" | "error";
-    originalName?: string;
-    format?: string;
-    orientation?: 'landscape' | 'portrait';
-    expiryTime?: string;
-    tags?: string[];
-    urls?: {
-      original: string;
-      webp: string;
-      avif: string;
-    };
-    sizes?: {
-      original: number;
-      webp: number;
-      avif: number;
-    };
-    error?: string;
-  }>;
+  results: ImageData[];
   onClose: () => void;
   onDelete?: (id: string) => Promise<void>;
 }
@@ -39,26 +21,7 @@ export default function ImageSidebar({
   onClose,
   onDelete,
 }: ImageSidebarProps) {
-  const [selectedImage, setSelectedImage] = useState<{
-    id: string;
-    status: "success" | "error";
-    originalName?: string;
-    format?: string;
-    orientation?: 'landscape' | 'portrait';
-    expiryTime?: string;
-    tags?: string[];
-    urls?: {
-      original: string;
-      webp: string;
-      avif: string;
-    };
-    sizes?: {
-      original: number;
-      webp: number;
-      avif: number;
-    };
-    error?: string;
-  } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [tab, setTab] = useState<"all" | "success" | "error">("all");
 
@@ -71,7 +34,7 @@ export default function ImageSidebar({
   const displayResults =
     tab === "all" ? results : tab === "success" ? successResults : errorResults;
 
-  const handleImageClick = (image: any) => {
+  const handleImageClick = (image: ImageData) => {
     setSelectedImage(image);
     setShowModal(true);
   };
@@ -256,7 +219,7 @@ export default function ImageSidebar({
 
       {/* 图片详情模态框 */}
       <ImageModal
-        image={selectedImage && selectedImage.status === "success" ? selectedImage as any : null}
+        image={selectedImage && selectedImage.status === "success" ? selectedImage as ImageData & { status: 'success' } : null}
         isOpen={showModal}
         onClose={handleCloseModal}
         onDelete={onDelete}

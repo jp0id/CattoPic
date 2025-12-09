@@ -34,8 +34,8 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-// 获取文件图标
-const getFileIcon = (fileName: string) => {
+// 获取文件图标 (保留以备将来使用)
+const _getFileIcon = (fileName: string) => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   
   switch (extension) {
@@ -51,6 +51,7 @@ const getFileIcon = (fileName: string) => {
       return <FileIcon className="h-10 w-10 text-gray-400" />
   }
 }
+void _getFileIcon;
 
 export default function PreviewSidebar({ 
   files, 
