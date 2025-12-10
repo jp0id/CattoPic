@@ -30,19 +30,17 @@ export default function ImageModal({ image, isOpen, onClose, onDelete }: ImageMo
     }
   }, [isOpen]);
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!image || !onDelete || !image.id) return;
 
-    try {
-      setIsDeleting(true);
-      await onDelete(image.id);
-      setShowDeleteConfirm(false);  
-      onClose();  
-    } catch (err) {
+    // 立即关闭弹窗，乐观更新会处理 UI
+    setShowDeleteConfirm(false);
+    onClose();
+
+    // 触发删除，不等待结果
+    onDelete(image.id).catch((err) => {
       console.error("删除失败:", err);
-    } finally {
-      setIsDeleting(false);
-    }
+    });
   };
 
   if (!image) return null;

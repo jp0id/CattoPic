@@ -124,21 +124,24 @@ const ImageCard = React.memo(function ImageCard({
     }
   }, [image]);
 
-  // 删除图片（带加载状态）
+  // 删除图片
   const handleDelete = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isDeleting) return; // 防止重复点击
 
+    // 立即关闭右键菜单，乐观更新会立即移除图片
+    closeContextMenu();
     setIsDeleting(true);
+
     try {
       await onDelete(image.id);
-      showToast("图片已删除", "success");
+      // 不需要 toast，乐观更新已经处理了 UI
     } catch {
       showToast("删除失败", "error");
     } finally {
       setIsDeleting(false);
     }
-  }, [image.id, onDelete, isDeleting]);
+  }, [image.id, onDelete, isDeleting, closeContextMenu]);
 
   // 鼠标事件处理
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);

@@ -116,18 +116,16 @@ export default function Manage() {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await deleteImageMutation.mutateAsync(id);
-      setStatus({
-        type: "success",
-        message: "删除成功",
-      });
-    } catch {
-      setStatus({
-        type: "error",
-        message: "删除失败",
-      });
-    }
+    // 使用 mutate 而不是 mutateAsync，因为乐观更新会立即移除图片
+    // 不需要等待 API 响应，错误会通过 mutation 的 onError 处理
+    deleteImageMutation.mutate(id, {
+      onError: () => {
+        setStatus({
+          type: "error",
+          message: "删除失败，已恢复",
+        });
+      },
+    });
   };
 
   // TanStack Query automatically refetches when filters change (via queryKey)
