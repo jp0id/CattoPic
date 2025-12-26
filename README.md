@@ -51,7 +51,6 @@ flowchart TB
     Hono -->|"Async Tasks"| Queue
     Hono -->|"Transform"| Images
 
-    Queue -->|"Process"| R2
     Cron -->|"Trigger"| Hono
     Images -->|"Output"| R2
 
@@ -73,7 +72,6 @@ flowchart TB
 | **Storage** | Cloudflare R2 | Store original and converted images (WebP/AVIF) |
 | **Database** | Cloudflare D1 | Image metadata, tags, API keys (SQLite) |
 | **Cache** | Cloudflare KV | Response caching, reduce D1 queries |
-| **Queue** | Cloudflare Queues | Async file deletion, batch processing |
 | **Images** | Cloudflare Images | On-the-fly format conversion and optimization |
 | **Cron** | Cron Triggers | Scheduled cleanup of expired images |
 
@@ -131,9 +129,6 @@ pnpm wrangler d1 create CattoPic-D1
 pnpm wrangler kv namespace create CACHE_KV
 # Note the id from output
 
-# Create Queue
-pnpm wrangler queues create cattopic-delete-queue
-
 # Initialize database schema
 pnpm wrangler d1 execute CattoPic-D1 --remote --file=schema.sql
 ```
@@ -159,12 +154,6 @@ database_id = '<your-database-id>'
 
 [[kv_namespaces]]
 id = "<your-kv-id>"
-
-[[queues.producers]]
-queue = "cattopic-delete-queue"
-
-[[queues.consumers]]
-queue = "cattopic-delete-queue"
 ```
 
 ### 4. Deploy Worker

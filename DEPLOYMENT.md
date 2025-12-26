@@ -15,10 +15,10 @@
 │                     │         │          │                      │
 └─────────────────────┘         │    ┌─────┴─────┐                │
                                 │    │           │                │
-                                │ ┌──▼───┐   ┌───▼──┐   ┌────┐   │
-                                │ │  R2  │   │  D1  │   │ KV │   │
-                                │ │Bucket│   │  DB  │   │    │   │
-                                │ └──────┘   └──────┘   └────┘   │
+                                │ ┌──▼───┐   ┌───▼──┐   ┌────┐    │
+                                │ │  R2  │   │  D1  │   │ KV │    │
+                                │ │Bucket│   │  DB  │   │    │    │
+                                │ └──────┘   └──────┘   └────┘    │
                                 └─────────────────────────────────┘
 ```
 
@@ -29,8 +29,6 @@
 | Storage | Cloudflare R2 | 图片文件存储 |
 | Database | Cloudflare D1 | SQLite 数据库（元数据、API Key） |
 | Cache | Cloudflare KV | 缓存层 |
-| Queue | Cloudflare Queues | 异步任务（文件删除） |
-
 ---
 
 ## 前置条件
@@ -334,9 +332,6 @@ pnpm wrangler kv namespace list
 
 # 查看 R2 存储桶
 pnpm wrangler r2 bucket list
-
-# 查看队列
-pnpm wrangler queues list
 ```
 
 ### Q5: 图片上传后无法访问

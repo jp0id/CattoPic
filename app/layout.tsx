@@ -18,7 +18,7 @@ const notoSansSC = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
-  title: "CattoPic - 图片管理",
+  title: "Pic - 图片管理",
   description: "一个简单而强大的图片管理工具",
   icons: {
     icon: [
@@ -59,11 +59,11 @@ export default function RootLayout({
         <div className="max-w-7xl mx-auto px-6 mt-8 text-center text-gray-600 dark:text-gray-400">
           Create By{" "}
           <a
-            href="https://catcat.blog/"
+            href="https://github.com/jp0id/CattoPic"
             target="_blank"
             className="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
           >
-            猫猫博客
+            Github
           </a>
         </div>
       </body>
