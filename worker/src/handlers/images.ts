@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
 import type { Env } from '../types';
 import { MetadataService } from '../services/metadata';
+import { StorageService } from '../services/storage';
 import { CacheService, CacheKeys, CACHE_TTL } from '../services/cache';
 import { successResponse, errorResponse, notFoundResponse } from '../utils/response';
 import { parseNumber, validateOrientation, validateImageListFormat, parseTags, sanitizeTagName, isValidUUID } from '../utils/validation';
@@ -215,7 +216,7 @@ export async function updateImageHandler(c: Context<{ Bindings: Env }>): Promise
 }
 
 // DELETE /api/images/:id - Delete image
-// D1 删除和缓存失效是同步的，R2 文件删除通过 Queue 异步处理
+// D1 删除、缓存失效和 R2 文件删除都是同步的（不再使用 Queue）
 export async function deleteImageHandler(c: Context<{ Bindings: Env }>): Promise<Response> {
   try {
     const id = c.req.param('id');
@@ -241,16 +242,11 @@ export async function deleteImageHandler(c: Context<{ Bindings: Env }>): Promise
       cache.invalidateTagsList(),
     ]);
 
-    // 3. 异步删除 R2 文件（最耗时的操作，通过 Queue 后台处理）
-    await c.env.DELETE_QUEUE.send({
-      type: 'delete_image',
-      imageId: id,
-      paths: {
-        original: image.paths.original,
-        webp: image.paths.webp || undefined,
-        avif: image.paths.avif || undefined,
-      },
-    });
+    // 3. 同步删除 R2 文件（不再使用 Queue）
+    const storage = new StorageService(c.env.R2_BUCKET);
+    const isNonEmptyString = (value: unknown): value is string => typeof value === 'string' && value.length > 0;
+    const keysToDelete = Array.from(new Set([image.paths.original, image.paths.webp, image.paths.avif].filter(isNonEmptyString)));
+    await storage.deleteMany(keysToDelete);
 
     return successResponse({ message: '图片已删除' });
 

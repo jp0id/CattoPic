@@ -13,8 +13,7 @@ import { randomHandler } from './handlers/random';
 import { faviconHandler } from './handlers/favicon';
 import { tagsHandler, createTagHandler, renameTagHandler, deleteTagHandler, batchTagsHandler } from './handlers/tags';
 import { validateApiKeyHandler, configHandler, cleanupHandler } from './handlers/system';
-import { handleQueueBatch } from './handlers/queue';
-import type { QueueMessage } from './types/queue';
+// Queue handlers removed - queues no longer used
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -156,18 +155,11 @@ async function scheduledHandler(
   }
 }
 
-// Queue handler for async R2 deletion
-async function queueHandler(
-  batch: MessageBatch<QueueMessage>,
-  env: Env
-): Promise<void> {
-  await handleQueueBatch(batch, env);
-}
+// Queue handler removed - queues no longer used
 
 const handlers = {
   fetch: app.fetch,
   scheduled: scheduledHandler,
-  queue: queueHandler,
 };
 
 export default handlers;

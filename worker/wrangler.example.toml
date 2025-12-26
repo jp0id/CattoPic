@@ -36,17 +36,8 @@ binding = "CACHE_KV"
 # Your KV namespace ID (get from: wrangler kv namespace list)
 id = "<your-kv-namespace-id>"
 
-# Queue for async R2 deletion
-[[queues.producers]]
-# Your queue name
-queue = "<your-queue-name>"
-binding = "DELETE_QUEUE"
-
-[[queues.consumers]]
-# Same queue name as above
-queue = "<your-queue-name>"
-max_batch_size = 10
-max_batch_timeout = 5
+# Queue removed to avoid Cloudflare paid feature usage
+# File deletion is now handled synchronously
 
 # Cron Triggers - cleanup expired images every hour
 [triggers]

@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Add server-side `format` filtering to `/api/images` (`all|gif|webp|avif|original`) to reduce client-side work for large libraries.
 - Increase Manage page page size from 24 to 60 to reduce request churn while scrolling.
 - Increase default `maxUploadCount` to 50 and use concurrency=5 for uploads (including AVIF).
+- Remove Cloudflare Queues dependency and switch to synchronous R2 file deletion to avoid paid feature usage (functionality unchanged, but API response times may increase for delete operations).
 
 ### Deprecated
 

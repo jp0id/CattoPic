@@ -141,15 +141,6 @@ database_id = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'  # 替换为你的 D1 datab
 binding = "CACHE_KV"
 id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # 替换为你的 KV namespace id
 
-[[queues.producers]]
-queue = "cattopic-delete-queue"
-binding = "DELETE_QUEUE"
-
-[[queues.consumers]]
-queue = "cattopic-delete-queue"
-max_batch_size = 10
-max_batch_timeout = 5
-
 [triggers]
 crons = ['0 * * * *']  # 每小时清理过期图片
 

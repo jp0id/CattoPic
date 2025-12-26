@@ -27,6 +27,7 @@
 - `/api/images` 新增 `format` 后端筛选（`all|gif|webp|avif|original`），减少大图库场景下前端筛选与处理开销。
 - 管理页单页加载数量从 24 提升到 60，减少滚动过程中的请求次数与抖动。
 - 默认 `maxUploadCount` 调整为 50，并发上传数量统一调整为 5（含 AVIF）。
+- 移除 Cloudflare Queues 依赖，改为同步 R2 文件删除以避免使用付费功能（功能不变，但删除操作的 API 响应时间可能增加）。
 
 ### 废弃
 

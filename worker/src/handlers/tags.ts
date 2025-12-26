@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
 import type { Env } from '../types';
 import { MetadataService } from '../services/metadata';
+import { StorageService } from '../services/storage';
 import { CacheService, CacheKeys, CACHE_TTL } from '../services/cache';
 import { successResponse, errorResponse } from '../utils/response';
 import { sanitizeTagName } from '../utils/validation';
@@ -113,7 +114,7 @@ export async function renameTagHandler(c: Context<{ Bindings: Env }>): Promise<R
 }
 
 // DELETE /api/tags/:name - Delete tag and associated images
-// D1 删除和缓存失效是同步的，R2 文件删除通过 Queue 异步处理
+// D1 删除、缓存失效和 R2 文件删除都是同步的（不再使用 Queue）
 export async function deleteTagHandler(c: Context<{ Bindings: Env }>): Promise<Response> {
   try {
     const name = normalizeTagRouteParam(c.req.param('name'));
@@ -124,7 +125,7 @@ export async function deleteTagHandler(c: Context<{ Bindings: Env }>): Promise<R
 
     const metadata = new MetadataService(c.env.DB);
 
-    // 1. 获取关联图片（一次查询，保存路径供队列使用）
+    // 1. 获取关联图片（一次查询，保存路径供后续删除使用）
     let images;
     try {
       images = await metadata.getImagePathsByTag(name);
@@ -161,24 +162,33 @@ export async function deleteTagHandler(c: Context<{ Bindings: Env }>): Promise<R
       throw err;
     }
 
-    // 4. 异步删除 R2 文件（通过 Queue 后台处理）
+    // 4. 同步删除 R2 文件（不再使用 Queue）
     if (imagePaths.length > 0) {
-      // Avoid large queue payloads by chunking
+      const storage = new StorageService(c.env.R2_BUCKET);
+      const isNonEmptyString = (value: unknown): value is string => typeof value === 'string' && value.length > 0;
+
+      // Avoid large batch operations by chunking
       const chunkSize = 50;
       for (let i = 0; i < imagePaths.length; i += chunkSize) {
         const chunk = imagePaths.slice(i, i + chunkSize);
         try {
-          await c.env.DELETE_QUEUE.send({
-            type: 'delete_tag_images',
-            tagName: name,
-            imagePaths: chunk,
-          });
+          // Collect all keys from all images in this chunk
+          const allKeys: string[] = [];
+          for (const img of chunk) {
+            const keys = [img.paths.original, img.paths.webp, img.paths.avif].filter(isNonEmptyString);
+            allKeys.push(...keys);
+          }
+          // Remove duplicates
+          const uniqueKeys = Array.from(new Set(allKeys));
+          if (uniqueKeys.length > 0) {
+            await storage.deleteMany(uniqueKeys);
+          }
         } catch (err) {
-          console.error(`[deleteTag] queue send failed: name=${name} chunk=${i}-${i + chunk.length - 1}`, err);
+          console.error(`[deleteTag] R2 deletion failed: name=${name} chunk=${i}-${i + chunk.length - 1}`, err);
           throw err;
         }
       }
-      console.log(`[deleteTag] queued R2 deletions: name=${name} chunks=${Math.ceil(imagePaths.length / chunkSize)}`);
+      console.log(`[deleteTag] R2 deletions completed: name=${name} chunks=${Math.ceil(imagePaths.length / chunkSize)}`);
     }
 
     return successResponse({
