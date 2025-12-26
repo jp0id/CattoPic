@@ -32,7 +32,6 @@ flowchart TB
         end
 
         subgraph Async["异步处理"]
-            Queue["📬 Queues<br/>───────────<br/>• 文件删除<br/>• 批量操作"]
             Cron["⏰ 定时触发器<br/>───────────<br/>• 清理过期图片<br/>• 每小时执行"]
         end
 
@@ -48,10 +47,8 @@ flowchart TB
     Hono -->|"读写"| R2
     Hono -->|"查询/更新"| D1
     Hono -->|"缓存"| KV
-    Hono -->|"异步任务"| Queue
     Hono -->|"图片转换"| Images
 
-    Queue -->|"处理"| R2
     Cron -->|"触发"| Hono
     Images -->|"输出"| R2
 
@@ -73,7 +70,6 @@ flowchart TB
 | **存储** | Cloudflare R2 | 存储原始图片和转换后的图片（WebP/AVIF） |
 | **数据库** | Cloudflare D1 | 图片元数据、标签、API 密钥（SQLite） |
 | **缓存** | Cloudflare KV | 响应缓存，减少 D1 查询 |
-| **队列** | Cloudflare Queues | 异步文件删除、批量处理 |
 | **图片处理** | Cloudflare Images | 实时格式转换和优化 |
 | **定时任务** | Cron Triggers | 定时清理过期图片 |
 
@@ -131,9 +127,6 @@ pnpm wrangler d1 create CattoPic-D1
 pnpm wrangler kv namespace create CACHE_KV
 # 记录输出中的 id
 
-# 创建队列
-pnpm wrangler queues create cattopic-delete-queue
-
 # 初始化数据库表结构
 pnpm wrangler d1 execute CattoPic-D1 --remote --file=schema.sql
 ```
@@ -159,12 +152,6 @@ database_id = '<你的数据库ID>'
 
 [[kv_namespaces]]
 id = "<你的KV-ID>"
-
-[[queues.producers]]
-queue = "cattopic-delete-queue"
-
-[[queues.consumers]]
-queue = "cattopic-delete-queue"
 ```
 
 ### 4. 部署 Worker

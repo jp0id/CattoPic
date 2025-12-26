@@ -15,10 +15,10 @@
 │                     │         │          │                      │
 └─────────────────────┘         │    ┌─────┴─────┐                │
                                 │    │           │                │
-                                │ ┌──▼───┐   ┌───▼──┐   ┌────┐   │
-                                │ │  R2  │   │  D1  │   │ KV │   │
-                                │ │Bucket│   │  DB  │   │    │   │
-                                │ └──────┘   └──────┘   └────┘   │
+                                │ ┌──▼───┐   ┌───▼──┐   ┌────┐    │
+                                │ │  R2  │   │  D1  │   │ KV │    │
+                                │ │Bucket│   │  DB  │   │    │    │
+                                │ └──────┘   └──────┘   └────┘    │
                                 └─────────────────────────────────┘
 ```
 
@@ -29,7 +29,6 @@
 | Storage | Cloudflare R2 | Image file storage |
 | Database | Cloudflare D1 | SQLite database (metadata, API keys) |
 | Cache | Cloudflare KV | Caching layer |
-| Queue | Cloudflare Queues | Async tasks (file deletion) |
 
 ---
 
@@ -93,19 +92,13 @@ binding = "CACHE_KV"
 id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Note this ID
 ```
 
-### 1.5 Create Queue
-
-```bash
-pnpm wrangler queues create cattopic-delete-queue
-```
-
-### 1.6 Initialize Database Schema
+### 1.5 Initialize Database Schema
 
 ```bash
 pnpm wrangler d1 execute CattoPic-D1 --remote --file=schema.sql
 ```
 
-### 1.7 Configure wrangler.toml
+### 1.6 Configure wrangler.toml
 
 Copy the template configuration file:
 
@@ -140,15 +133,6 @@ database_id = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'  # Replace with your D1 dat
 [[kv_namespaces]]
 binding = "CACHE_KV"
 id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Replace with your KV namespace id
-
-[[queues.producers]]
-queue = "cattopic-delete-queue"
-binding = "DELETE_QUEUE"
-
-[[queues.consumers]]
-queue = "cattopic-delete-queue"
-max_batch_size = 10
-max_batch_timeout = 5
 
 [triggers]
 crons = ['0 * * * *']  # Cleanup expired images hourly
@@ -343,9 +327,6 @@ pnpm wrangler kv namespace list
 
 # View R2 buckets
 pnpm wrangler r2 bucket list
-
-# View queues
-pnpm wrangler queues list
 ```
 
 ### Q5: Images Not Accessible After Upload

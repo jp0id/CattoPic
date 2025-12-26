@@ -91,19 +91,13 @@ binding = "CACHE_KV"
 id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # 记录此 ID
 ```
 
-### 1.5 创建 Queue
-
-```bash
-pnpm wrangler queues create cattopic-delete-queue
-```
-
-### 1.6 初始化数据库表结构
+### 1.5 初始化数据库表结构
 
 ```bash
 pnpm wrangler d1 execute CattoPic-D1 --remote --file=schema.sql
 ```
 
-### 1.7 配置 wrangler.toml
+### 1.6 配置 wrangler.toml
 
 从模板复制配置文件：
 

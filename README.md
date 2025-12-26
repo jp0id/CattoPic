@@ -32,7 +32,6 @@ flowchart TB
         end
 
         subgraph Async["Async Processing"]
-            Queue["📬 Queues<br/>───────────<br/>• File deletion<br/>• Batch operations"]
             Cron["⏰ Cron Triggers<br/>───────────<br/>• Cleanup expired<br/>• Hourly schedule"]
         end
 
@@ -48,7 +47,6 @@ flowchart TB
     Hono -->|"Read/Write"| R2
     Hono -->|"Query/Update"| D1
     Hono -->|"Cache"| KV
-    Hono -->|"Async Tasks"| Queue
     Hono -->|"Transform"| Images
 
     Cron -->|"Trigger"| Hono

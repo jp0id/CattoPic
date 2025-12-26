@@ -7,7 +7,7 @@
   - `app/utils/`: client utilities (API requests, concurrent upload, ZIP helpers)
 - `worker/`: Cloudflare Worker backend (Hono) and infrastructure bindings:
   - `worker/src/handlers/`: HTTP route handlers (upload/images/tags/system)
-  - `worker/src/services/`: D1/R2/KV/Images/Queue services
+  - `worker/src/services/`: D1/R2/KV/Images services
   - `worker/src/utils/`: shared helpers (validation/response)
 - `docs/`: API and deployment docs
 - `public/`: static assets
@@ -52,7 +52,7 @@ There is no dedicated test runner yet. Validate changes with:
 
 - Do not commit secrets. Use `.env.example` and `worker/wrangler.example.toml` as templates.
 - Frontend expects `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_REMOTE_PATTERNS`.
-- Worker binds R2/D1/KV/Queues/Images via `worker/wrangler.toml`.
+- Worker binds R2/D1/KV/Images via `worker/wrangler.toml`.
 
 
 ## Additional Agent Rules
@@ -87,7 +87,7 @@ Changelog updates are mandatory for any user-facing behavior change, API change,
 * Any new backend feature **must comply with Cloudflare Workers best practices**, including:
 
   * Stateless request handling
-  * Correct use of bindings (D1/R2/KV/Queues/Images)
+  * Correct use of bindings (D1/R2/KV/Images)
   * Avoidance of long-running CPU tasks and blocking operations
   * Respect for Workers execution time and memory limits
 * Prefer edge-native patterns (streaming, batching, queue offloading) where applicable.
